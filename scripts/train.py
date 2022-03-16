@@ -37,7 +37,9 @@ model_params = dict(
     emb_dim=512,
     pad_id=TRAIN_CONSTANTS.PAD,
     history=TRAIN_CONSTANTS.HISTORY,
-    trained=None,
+    trained=
+    "../models/bert4rec-itr-1/model_files_initial/bert4rec-state-dict.pth",
+    # trained=None,
     LEARNING_RATE=1e-4,
     EPOCHS=100,
     SAVE_NAME="bert4rec.pt",
@@ -58,6 +60,6 @@ data_params = dict(path="../data/ratings_mapped.csv",
                                            shuffle=False,
                                            num_workers=0)))
 
-output_dir = "../models/bert4rec-itr-1"
+output_dir = "../models/bert4rec-itr-2"
 
 trainer(data_params, model_params, loggers, output_dir)
