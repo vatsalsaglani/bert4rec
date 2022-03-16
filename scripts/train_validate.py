@@ -84,4 +84,4 @@ def validate_step(model, loader, device, MASK=1):
 
     epoch_acc = calculate_combined_mean(valid_bs, valid_accs)
 
-    return total_loss / total_counts, epoch_acc
+    return total_loss / total_counts, epoch_acc.item()
