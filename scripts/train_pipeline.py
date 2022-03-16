@@ -136,6 +136,8 @@ def trainer(data_params, model_params, loggers, output_dir="./models/"):
                 os.path.join(output_dir, "model_files",
                              "SAVE_STATE_DICT_NAME"))
 
+        losses.append(train_loss)
+
         valid_loss, valid_acc = validate_step(model, valid_dl, device,
                                               data_params.get("MASK"))
 
