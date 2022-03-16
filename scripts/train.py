@@ -31,7 +31,7 @@ loggers = dict(CONSOLE=console,
 
 model_params = dict(
     SEED=3007,
-    VOCAB_SIZE=9725,
+    VOCAB_SIZE=9726,
     heads=4,
     layers=6,
     emb_dim=512,
