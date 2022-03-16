@@ -66,7 +66,7 @@ def validate_step(model, loader, device, MASK=1):
     valid_accs = []
     valid_bs = []
 
-    for _, batch in enumerate(tqdm(loader, desc="Train Loader")):
+    for _, batch in enumerate(tqdm(loader, desc="Valid Loader")):
 
         source = Variable(batch["source"].to(device))
         target = Variable(batch["target"].to(device))
