@@ -1,0 +1,7 @@
+torch
+tqdm
+rich[jupyter]
+numpy
+pandas
+scikit-learn
+git+https://github.com/vatsalsaglani/AttentionTransformerPackage.git
