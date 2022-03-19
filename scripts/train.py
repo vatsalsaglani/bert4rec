@@ -40,7 +40,7 @@ model_params = dict(
     trained=
     "../models/bert4rec-itr-1/model_files_initial/bert4rec-state-dict.pth",
     # trained=None,
-    LEARNING_RATE=1e-4,
+    LEARNING_RATE=0,
     EPOCHS=100,
     SAVE_NAME="bert4rec.pt",
     SAVE_STATE_DICT_NAME="bert4rec-state-dict.pth",
