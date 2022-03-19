@@ -1,9 +1,16 @@
 from tqdm import tqdm, tqdm_notebook
 from train_util import *
 from torch.autograd import Variable
+import torch as T
 
 
-def train_step(model, device, loader, optimizer, MASK=1):
+def train_step(model,
+               device,
+               loader,
+               optimizer,
+               scheduled_optim=False,
+               MASK=1,
+               CLIP=2):
     """Train batch step
 
     Args:
@@ -38,7 +45,11 @@ def train_step(model, device, loader, optimizer, MASK=1):
         total_loss += loss.item()
 
         loss.backward()
-        optimizer.step()
+        T.nn.utils.clip_grad_norm_(model.parameters(), CLIP)
+        if scheduled_optim:
+            optimizer.step_and_update_lr()
+        else:
+            optimizer.step()
 
         mean = calculate_accuracy(output, target, mask)
         train_accs += [mean.item()]
