@@ -72,8 +72,9 @@ def trainer(data_params,
     if warmup_steps:
         optimizer = ScheduledOptimizer(
             T.optim.Adam(params=model.parameters(),
-                         lr=model_params.get("LEARNING_RATE")), 1e-6,
-            model_params.get("emb_dim"))
+                         lr=model_params.get("LEARNING_RATE"),
+                         betas=(0.9, 0.98),
+                         eps=1e-9), 1e-6, model_params.get("emb_dim"))
     else:
         optimizer = T.optim.Adam(params=model.parameters(),
                                  lr=model_params.get("LEARNING_RATE"))
