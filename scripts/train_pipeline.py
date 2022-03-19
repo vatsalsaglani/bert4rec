@@ -126,7 +126,8 @@ def trainer(data_params,
                      epoch=epoch,
                      train_loss=train_loss,
                      train_acc=train_acc,
-                     optimizer_dict=optimizer.state_dict()),
+                     optimizer_dict=optimizer._optimizer.state_dict()
+                     if warmup_steps else optimizer.state_dict()),
                 os.path.join(output_dir, "model_files_initial",
                              model_params.get("SAVE_STATE_DICT_NAME")))
 
@@ -143,7 +144,8 @@ def trainer(data_params,
                      epoch=epoch,
                      train_acc=train_acc,
                      train_loss=train_loss,
-                     optimizer_dict=optimizer.state_dict()),
+                     optimizer_dict=optimizer._optimizer.state_dict()
+                     if warmup_steps else optimizer.state_dict()),
                 os.path.join(output_dir, "model_files",
                              model_params.get("SAVE_STATE_DICT_NAME")))
 
