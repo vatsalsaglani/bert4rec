@@ -14,11 +14,16 @@ from rich.console import Console
 from torch import cuda
 from train_validate import train_step, validate_step
 from sklearn.model_selection import train_test_split
+from AttentionTransformer.ScheduledOptimizer import ScheduledOptimizer
 
 device = T.device('cuda') if cuda.is_available() else T.device('cpu')
 
 
-def trainer(data_params, model_params, loggers, output_dir="./models/"):
+def trainer(data_params,
+            model_params,
+            loggers,
+            warmup_steps=False,
+            output_dir="./models/"):
 
     # console instance
 
@@ -64,8 +69,14 @@ def trainer(data_params, model_params, loggers, output_dir="./models/"):
     console.log(f'MOVING MODEL TO DEVICE: {device}')
     model = model.to(device)
 
-    optimizer = T.optim.Adam(params=model.parameters(),
-                             lr=model_params.get("LEARNING_RATE"))
+    if warmup_steps:
+        optimizer = ScheduledOptimizer(
+            T.optim.Adam(params=model.parameters(),
+                         lr=model_params.get("LEARNING_RATE")), 1e-6,
+            model_params.get("emb_dim"))
+    else:
+        optimizer = T.optim.Adam(params=model.parameters(),
+                                 lr=model_params.get("LEARNING_RATE"))
 
     console.log("OPTIMIZER AND MODEL DONE")
 
