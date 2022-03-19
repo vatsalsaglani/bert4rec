@@ -1,7 +1,7 @@
 import os
 import re
 import pandas as pd
-from tqdm import trange
+from tqdm import trange, tnrange
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
@@ -96,7 +96,7 @@ def trainer(data_params, model_params, loggers, output_dir="./models/"):
                           **data_params.get("LOADERS").get("VALID"))
 
     losses = []
-    for epoch in trange(1, model_params.get("EPOCHS") + 1):
+    for epoch in tnrange(1, model_params.get("EPOCHS") + 1):
 
         train_loss, train_acc = train_step(model, device, train_dl, optimizer,
                                            data_params.get("MASK"))
@@ -134,7 +134,7 @@ def trainer(data_params, model_params, loggers, output_dir="./models/"):
                      train_loss=train_loss,
                      optimizer_dict=optimizer.state_dict()),
                 os.path.join(output_dir, "model_files",
-                             "SAVE_STATE_DICT_NAME"))
+                             model_params.get("SAVE_STATE_DICT_NAME")))
 
         losses.append(train_loss)
 
