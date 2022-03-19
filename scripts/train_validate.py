@@ -1,4 +1,4 @@
-from tqdm import tqdm
+from tqdm import tqdm, tqdm_notebook
 from train_util import *
 from torch.autograd import Variable
 
@@ -21,7 +21,7 @@ def train_step(model, device, loader, optimizer, MASK=1):
     total_counts = 0
     train_accs = []
     train_bs = []
-    for _, batch in enumerate(tqdm(loader, desc="Train Loader")):
+    for _, batch in enumerate(tqdm_notebook(loader, desc="Train Loader")):
 
         source = Variable(batch["source"].to(device))
         target = Variable(batch["target"].to(device))
@@ -66,7 +66,7 @@ def validate_step(model, loader, device, MASK=1):
     valid_accs = []
     valid_bs = []
 
-    for _, batch in enumerate(tqdm(loader, desc="Valid Loader")):
+    for _, batch in enumerate(tqdm_notebook(loader, desc="Valid Loader")):
 
         source = Variable(batch["source"].to(device))
         target = Variable(batch["target"].to(device))
