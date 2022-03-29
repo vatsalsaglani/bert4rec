@@ -112,7 +112,8 @@ def trainer(data_params,
     losses = []
     for epoch in tnrange(1, model_params.get("EPOCHS") + 1):
 
-        train_loss, train_acc = train_step(model, device, train_dl, optimizer,
+        train_loss, train_acc = train_step(model, device, train_dl,
+                                           optimizer, warmup_steps,
                                            data_params.get("MASK"))
         train_logger.add_row(str(epoch), str(train_loss), str(train_acc))
 
