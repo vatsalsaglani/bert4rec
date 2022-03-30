@@ -15,6 +15,7 @@ from torch import cuda
 from train_validate import train_step, validate_step
 from sklearn.model_selection import train_test_split
 from AttentionTransformer.ScheduledOptimizer import ScheduledOptimizer
+from IPython.display import clear_output
 
 device = T.device('cuda') if cuda.is_available() else T.device('cpu')
 
@@ -113,8 +114,9 @@ def trainer(data_params,
                           **data_params.get("LOADERS").get("VALID"))
 
     losses = []
-    for epoch in trange(1, model_params.get("EPOCHS") + 1):
-
+    for epoch in tnrange(1, model_params.get("EPOCHS") + 1):
+        if epoch % 3 == 0:
+            clear_output(wait=True)
         train_loss, train_acc = train_step(model, device, train_dl,
                                            optimizer, warmup_steps,
                                            data_params.get("MASK"))
