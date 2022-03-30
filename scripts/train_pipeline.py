@@ -89,6 +89,9 @@ def trainer(data_params,
     train_data, valid_data = train_test_split(
         data, test_size=0.25, random_state=model_params.get("SEED"))
 
+    console.log("LEN OF TRAIN DATASET: ", len(train_data))
+    console.log("LEN OF VALID DATASET: ", len(valid_data))
+
     train_dataset = Bert4RecDataset(train_data,
                                     data_params.get("group_by_col"),
                                     data_params.get("data_col"),
@@ -110,7 +113,7 @@ def trainer(data_params,
                           **data_params.get("LOADERS").get("VALID"))
 
     losses = []
-    for epoch in tnrange(1, model_params.get("EPOCHS") + 1):
+    for epoch in trange(1, model_params.get("EPOCHS") + 1):
 
         train_loss, train_acc = train_step(model, device, train_dl,
                                            optimizer, warmup_steps,
