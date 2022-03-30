@@ -17,10 +17,11 @@ def calculate_loss(y_pred: T.tensor, y_true: T.tensor, mask: T.tensor):
     """
     y_pred = y_pred.view(-1, y_pred.size(2))
     y_true = y_true.view(-1)
-    loss = F.cross_entropy(y_pred, y_true, reduction="none")
-    loss = loss * mask.view(-1)
-    loss = loss.sum() / (mask.sum() + 1e-8)
+    loss = F.cross_entropy(y_pred, y_true, reduction="mean", ignore_index=0)
     return loss
+    # loss = loss * mask.view(-1)
+    # loss = loss.sum() / (mask.sum() + 1e-8)
+    # return loss
 
 
 def calculate_accuracy(y_pred: T.tensor, y_true: T.tensor, mask: T.tensor):
