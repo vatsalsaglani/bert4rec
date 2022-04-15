@@ -62,4 +62,4 @@ data_params = dict(path="../data/ratings_mapped.csv",
 
 output_dir = "../models/bert4rec-itr-2"
 
-trainer(data_params, model_params, loggers, output_dir)
+trainer(data_params, model_params, loggers, full_train=True)
