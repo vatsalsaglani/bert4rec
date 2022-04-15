@@ -1,5 +1,6 @@
 import os
 import re
+from numpy import full
 import pandas as pd
 from tqdm import trange, tnrange
 import torch as T
@@ -24,7 +25,8 @@ def trainer(data_params,
             model_params,
             loggers,
             warmup_steps=False,
-            output_dir="./models/"):
+            output_dir="./models/",
+            full_train=False):
 
     # console instance
 
@@ -108,10 +110,17 @@ def trainer(data_params,
                                     data_params.get("padding_mode",
                                                     "right"), "valid")
 
-    train_dl = DataLoader(train_dataset,
-                          **data_params.get("LOADERS").get("TRAIN"))
+    if full_train:
+        train_dl = DataLoader(train_dataset + valid_dataset,
+                              **data_params.get("LOADERS").get("TRAIN"))
+    else:
+        train_dl = DataLoader(train_dataset,
+                              **data_params.get("LOADERS").get("TRAIN"))
     valid_dl = DataLoader(valid_dataset,
                           **data_params.get("LOADERS").get("VALID"))
+
+    # if full_train:
+    #     train_dl += valid_dl
 
     losses = []
     for epoch in tnrange(1, model_params.get("EPOCHS") + 1):
