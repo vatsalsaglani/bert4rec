@@ -73,7 +73,6 @@ def trainer(data_params,
             T.load(model_params.get("trained"))["state_dict"])
         console.log("MODEL LOADED")
     console.log(f'MOVING MODEL TO DEVICE: {device}')
-    model = model.to(device)
 
     if modify_last_fc:
 
@@ -103,6 +102,9 @@ def trainer(data_params,
         model.lin_op = new_lin_layer
         # model.lin_op.weight.retain_grad()
         console.log("MODEL LIN OP: ", model.lin_op.out_features)
+
+    model = model.to(device)
+    
     if warmup_steps:
         optimizer = ScheduledOptimizer(
             T.optim.SGD(params=model.parameters(),
