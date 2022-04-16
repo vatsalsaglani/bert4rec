@@ -65,6 +65,16 @@ def trainer(data_params,
                                 pad_id=model_params.get("pad_id", 0),
                                 num_pos=120)
 
+    # model.encoder.sou
+    if model_params.get("trained"):
+        #   load the already trained model
+        console.log("TRAINED MODEL AVAILABLE. LOADING...")
+        model.load_state_dict(
+            T.load(model_params.get("trained"))["state_dict"])
+        console.log("MODEL LOADED")
+    console.log(f'MOVING MODEL TO DEVICE: {device}')
+    model = model.to(device)
+
     if modify_last_fc:
 
         new_word_embedding = nn.Embedding(model_params.get("NEW_VOCAB_SIZE"),
@@ -90,16 +100,6 @@ def trainer(data_params,
                                  model_params.get("NEW_VOCAB_SIZE"))
         model.lin_op.weight.retain_grad()
         console.log("MODEL LIN OP: ", model.lin_op.out_features)
-    # model.encoder.sou
-    if model_params.get("trained"):
-        #   load the already trained model
-        console.log("TRAINED MODEL AVAILABLE. LOADING...")
-        model.load_state_dict(
-            T.load(model_params.get("trained"))["state_dict"])
-        console.log("MODEL LOADED")
-    console.log(f'MOVING MODEL TO DEVICE: {device}')
-    model = model.to(device)
-
     if warmup_steps:
         optimizer = ScheduledOptimizer(
             T.optim.SGD(params=model.parameters(),
