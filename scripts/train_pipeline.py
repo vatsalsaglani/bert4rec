@@ -95,10 +95,13 @@ def trainer(data_params,
         # console.log(
         #     f"WORD EMBEDDING REQUIRES GRAD `{model.encoder.word_embedding.weight.requires_grad}`"
         # )
-
-        model.lin_op = nn.Linear(model_params.get("emb_dim"),
-                                 model_params.get("NEW_VOCAB_SIZE"))
-        model.lin_op.weight.retain_grad()
+        new_lin_layer = nn.Linear(model_params.get("emb_dim"),
+                                  model_params.get("NEW_VOCAB_SIZE"))
+        new_lin_layer.weight.requires_grad = False
+        new_lin_layer.weight[:model.lin_op.weight.
+                             size(0)] = model.lin_op.weight.clone().detach()
+        model.lin_op = new_lin_layer
+        # model.lin_op.weight.retain_grad()
         console.log("MODEL LIN OP: ", model.lin_op.out_features)
     if warmup_steps:
         optimizer = ScheduledOptimizer(
