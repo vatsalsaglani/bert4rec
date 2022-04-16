@@ -37,29 +37,31 @@ model_params = dict(
     emb_dim=512,
     pad_id=TRAIN_CONSTANTS.PAD,
     history=TRAIN_CONSTANTS.HISTORY,
-    trained=
-    "../models/bert4rec-itr-1/model_files_initial/bert4rec-state-dict.pth",
-    # trained=None,
+    # trained=
+    # "../models/bert4rec-itr-1/model_files_initial/bert4rec-state-dict.pth",
+    trained=None,
     LEARNING_RATE=0,
     EPOCHS=100,
     SAVE_NAME="bert4rec.pt",
     SAVE_STATE_DICT_NAME="bert4rec-state-dict.pth",
-)
+    NEW_VOCAB_SIZE=59048)
 
-data_params = dict(path="../data/ratings_mapped.csv",
-                   group_by_col="userId",
-                   data_col="movieId_mapped",
-                   train_history=TRAIN_CONSTANTS.HISTORY,
-                   valid_history=5,
-                   padding_mode="right",
-                   MASK=TRAIN_CONSTANTS.MASK,
-                   LOADERS=dict(TRAIN=dict(batch_size=8,
-                                           shuffle=True,
-                                           num_workers=0),
-                                VALID=dict(batch_size=4,
-                                           shuffle=False,
-                                           num_workers=0)))
+data_params = dict(
+    path="../data/ml-25m/ml-25m/ratings_mapped.csv",
+    # path="../data/ratings_mapped.csv",
+    group_by_col="userId",
+    data_col="movieId_mapped",
+    train_history=TRAIN_CONSTANTS.HISTORY,
+    valid_history=5,
+    padding_mode="right",
+    MASK=TRAIN_CONSTANTS.MASK,
+    LOADERS=dict(TRAIN=dict(batch_size=8, shuffle=True, num_workers=0),
+                 VALID=dict(batch_size=4, shuffle=False, num_workers=0)))
 
 output_dir = "../models/bert4rec-itr-2"
 
-trainer(data_params, model_params, loggers, full_train=True)
+trainer(data_params,
+        model_params,
+        loggers,
+        full_train=True,
+        modify_last_fc=True)
