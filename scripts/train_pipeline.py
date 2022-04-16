@@ -26,7 +26,8 @@ def trainer(data_params,
             loggers,
             warmup_steps=False,
             output_dir="./models/",
-            full_train=False):
+            full_train=False,
+            modify_last_fc=False):
 
     # console instance
 
@@ -63,6 +64,33 @@ def trainer(data_params,
                                 emb_dim=model_params.get("emb_dim", 512),
                                 pad_id=model_params.get("pad_id", 0),
                                 num_pos=120)
+
+    if modify_last_fc:
+
+        new_word_embedding = nn.Embedding(model_params.get("NEW_VOCAB_SIZE"),
+                                          model_params.get("emb_dim"), 0)
+        new_word_embedding.weight.requires_grad = False
+        console.log(
+            f"REQUIRES GRAD for `NEW WORD EMBEDDING` set to {new_word_embedding.weight.requires_grad}"
+        )
+
+        new_word_embedding.weight[:model.encoder.word_embedding.weight.size(
+            0)] = model.encoder.word_embedding.weight.clone().detach()
+
+        model.encoder.word_embedding = new_word_embedding
+        # model.encoder.word_embedding.weight.retain_grad()
+        console.log(
+            f"WORD EMBEDDING MODIFIED TO `{model.encoder.word_embedding}`")
+
+        # console.log(
+        #     f"WORD EMBEDDING REQUIRES GRAD `{model.encoder.word_embedding.weight.requires_grad}`"
+        # )
+
+        model.lin_op = nn.Linear(model_params.get("emb_dim"),
+                                 model_params.get("NEW_VOCAB_SIZE"))
+        model.lin_op.weight.retain_grad()
+        console.log("MODEL LIN OP: ", model.lin_op.out_features)
+    # model.encoder.sou
     if model_params.get("trained"):
         #   load the already trained model
         console.log("TRAINED MODEL AVAILABLE. LOADING...")
