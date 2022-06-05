@@ -1,6 +1,5 @@
 import os
 import re
-from numpy import full
 import pandas as pd
 from tqdm import trange, tnrange
 import torch as T
@@ -17,6 +16,7 @@ from train_validate import train_step, validate_step
 from sklearn.model_selection import train_test_split
 from AttentionTransformer.ScheduledOptimizer import ScheduledOptimizer
 from IPython.display import clear_output
+from AttentionTransformer.utilities import count_model_parameters
 
 device = T.device('cuda') if cuda.is_available() else T.device('cpu')
 
@@ -58,12 +58,13 @@ def trainer(data_params,
     # intialize model
     console.log("MODEL PARAMS: ", model_params)
     console.log("INITIALIZING MODEL: ", model_params)
-    model = RecommendationModel(vocab_size=model_params.get("VOCAB_SIZE"),
-                                heads=model_params.get("heads", 4),
-                                layers=model_params.get("layers", 6),
-                                emb_dim=model_params.get("emb_dim", 512),
-                                pad_id=model_params.get("pad_id", 0),
-                                num_pos=120)
+    model = RecommendationModel(
+        vocab_size=model_params.get("VOCAB_SIZE"),
+        heads=model_params.get("heads", 4),
+        layers=model_params.get("layers", 6),
+        emb_dim=model_params.get("emb_dim", 512),
+        pad_id=model_params.get("pad_id", 0),
+    )
 
     # model.encoder.sou
     if model_params.get("trained"):
@@ -104,7 +105,11 @@ def trainer(data_params,
         console.log("MODEL LIN OP: ", model.lin_op.out_features)
 
     model = model.to(device)
-    
+
+    console.log(
+        f"TOTAL NUMBER OF MODEL PARAMETERS: {count_model_parameters(model)/1e6}Million"
+    )
+
     if warmup_steps:
         optimizer = ScheduledOptimizer(
             T.optim.SGD(params=model.parameters(),
