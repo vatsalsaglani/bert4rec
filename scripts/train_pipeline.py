@@ -107,7 +107,7 @@ def trainer(data_params,
     model = model.to(device)
 
     console.log(
-        f"TOTAL NUMBER OF MODEL PARAMETERS: {count_model_parameters(model)/1e6}Million"
+        f"TOTAL NUMBER OF MODEL PARAMETERS: {round(count_model_parameters(model)/1e6, 2)} Million"
     )
 
     if warmup_steps:
