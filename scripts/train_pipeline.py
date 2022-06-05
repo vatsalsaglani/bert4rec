@@ -147,7 +147,7 @@ def trainer(data_params,
                                     data_params.get("valid_history", 5),
                                     data_params.get("padding_mode",
                                                     "right"), "valid")
-
+    console.save_text(os.path.join(output_dir, "logs_model_initialization.txt"))
     if full_train:
         train_dl = DataLoader(train_dataset + valid_dataset,
                               **data_params.get("LOADERS").get("TRAIN"))
@@ -213,4 +213,4 @@ def trainer(data_params,
         valid_logger.add_row(str(epoch), str(valid_loss), str(valid_acc))
         console.log(valid_logger)
 
-        console.save_text(os.path.join(output_dir, "logs.txt"))
+        console.save_text(os.path.join(output_dir, "logs_training.txt"))
