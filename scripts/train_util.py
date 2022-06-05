@@ -3,6 +3,7 @@ import torch.nn.functional as F
 from typing import List
 
 
+
 def calculate_loss(y_pred: T.tensor, y_true: T.tensor, mask: T.tensor):
     """Calculates the loss between true and predicted using cross entropy
 
@@ -15,13 +16,13 @@ def calculate_loss(y_pred: T.tensor, y_true: T.tensor, mask: T.tensor):
     Returns:
         T.tensor: Total loss
     """
-    y_pred = y_pred.view(-1, y_pred.size(2))
-    y_true = y_true.view(-1)
-    loss = F.cross_entropy(y_pred, y_true, reduction="mean", ignore_index=0)
-    return loss
-    # loss = loss * mask.view(-1)
-    # loss = loss.sum() / (mask.sum() + 1e-8)
+    # y_pred = y_pred.view(-1, y_pred.size(2))
+    # y_true = y_true.view(-1)
+    loss = F.cross_entropy(y_pred.permute(1, 2, 0), y_true, reduction="none", ignore_index=0)
     # return loss
+    loss = loss * mask
+    loss = loss.sum() / (mask.sum() + 1e-8)
+    return loss
 
 
 def calculate_accuracy(y_pred: T.tensor, y_true: T.tensor, mask: T.tensor):
@@ -38,7 +39,7 @@ def calculate_accuracy(y_pred: T.tensor, y_true: T.tensor, mask: T.tensor):
     """
     _, prediction = y_pred.max(2)
     y_true = T.masked_select(y_true, mask)
-    prediction = T.masked_select(prediction, mask)
+    prediction = T.masked_select(prediction.permute(1, 0), mask)
 
     return (y_true == prediction).double().mean()
 
