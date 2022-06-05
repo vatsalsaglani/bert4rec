@@ -47,8 +47,8 @@ model_params = dict(
     NEW_VOCAB_SIZE=59048)
 
 data_params = dict(
-    path="../data/ml-25m/ml-25m/ratings_mapped.csv",
-    # path="../data/ratings_mapped.csv",
+    # path="../data/ml-25m/ml-25m/ratings_mapped.csv",
+    path="../data/ratings_mapped.csv",
     group_by_col="userId",
     data_col="movieId_mapped",
     train_history=TRAIN_CONSTANTS.HISTORY,
@@ -60,8 +60,10 @@ data_params = dict(
 
 output_dir = "../models/bert4rec-itr-2"
 
-trainer(data_params,
-        model_params,
-        loggers,
-        full_train=True,
-        modify_last_fc=True)
+trainer(data_params=data_params,
+        model_params=model_params,
+        loggers=loggers,
+        warmup_steps=False,
+        output_dir=output_dir,
+        full_train=False,
+        modify_last_fc=False)
