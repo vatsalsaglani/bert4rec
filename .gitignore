@@ -3,3 +3,5 @@ scripts/__pycache__/
 models/
 .vscode/
 data/ml-25m/
+data/.DS_Store
+.DS_Store
