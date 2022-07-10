@@ -24,6 +24,7 @@ device = T.device('cuda') if cuda.is_available() else T.device('cpu')
 def trainer(data_params,
             model_params,
             loggers,
+            optimizer_params=None,
             warmup_steps=False,
             output_dir="./models/",
             full_train=False,
@@ -113,17 +114,30 @@ def trainer(data_params,
         f"TOTAL NUMBER OF MODEL PARAMETERS: {round(count_model_parameters(model)/1e6, 2)} Million"
     )
 
-    if warmup_steps:
-        optimizer = ScheduledOptimizer(
-            T.optim.SGD(params=model.parameters(),
-                        lr=model_params.get("LEARNING_RATE"),
-                        momentum=0.8,
-                        nesterov=True), 1e-6, model_params.get("emb_dim"))
+    # if warmup_steps:
+    #     optimizer = ScheduledOptimizer(
+    #         T.optim.SGD(params=model.parameters(),
+    #                     lr=model_params.get("LEARNING_RATE"),
+    #                     momentum=0.8,
+    #                     nesterov=True), 1e-6, model_params.get("emb_dim"))
+    # else:
+    optim_name = optimizer_params.get("OPTIM_NAME")
+    if optim_name == "SGD":
+        optimizer = T.optim.SGD(params=model.parameters(),
+                                **optimizer_params.get("PARAMS"))
+    elif optim_name == "ADAM":
+        optimizer = T.optim.Adam(params=model.parameters(),
+                                 **optimizer_params.get("PARAMS"))
+
     else:
         optimizer = T.optim.SGD(params=model.parameters(),
                                 lr=model_params.get("LEARNING_RATE"),
                                 momentum=0.8,
                                 nesterov=True)
+
+    if warmup_steps:
+        optimizer = ScheduledOptimizer(optimizer, 1e-6,
+                                       model_params.get("emb_dim"))
 
     console.log("OPTIMIZER AND MODEL DONE")
 
