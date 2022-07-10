@@ -58,6 +58,14 @@ data_params = dict(
     LOADERS=dict(TRAIN=dict(batch_size=8, shuffle=True, num_workers=0),
                  VALID=dict(batch_size=4, shuffle=False, num_workers=0)))
 
+optimizer_params = {
+    "OPTIM_NAME": "SGD",
+    "PARAMS": {
+        "lr": 0.19,
+        "nestrov": True
+    }
+}
+
 output_dir = "../models/bert4rec-itr-2"
 
 trainer(data_params=data_params,
@@ -66,4 +74,6 @@ trainer(data_params=data_params,
         warmup_steps=False,
         output_dir=output_dir,
         full_train=False,
-        modify_last_fc=False)
+        modify_last_fc=False,
+        validation=False,
+        optimizer_params=optimizer_params)
