@@ -95,6 +95,7 @@ def trainer(data_params,
         # console.log(
         #     f"WORD EMBEDDING REQUIRES GRAD `{model.encoder.word_embedding.weight.requires_grad}`"
         # )
+        model.encoder.word_embedding.weight.requires_grad = True
         new_lin_layer = nn.Linear(model_params.get("emb_dim"),
                                   model_params.get("NEW_VOCAB_SIZE"))
         new_lin_layer.weight.requires_grad = False
@@ -102,6 +103,7 @@ def trainer(data_params,
                              size(0)] = model.lin_op.weight.clone().detach()
         model.lin_op = new_lin_layer
         # model.lin_op.weight.retain_grad()
+        model.lin_op.weight.requires_grad = True
         console.log("MODEL LIN OP: ", model.lin_op.out_features)
 
     model = model.to(device)
