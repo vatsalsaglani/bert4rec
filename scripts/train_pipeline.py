@@ -29,7 +29,7 @@ def trainer(data_params,
             output_dir="./models/",
             full_train=False,
             modify_last_fc=False,
-            validation=False):
+            validation=5):
 
     # console instance
 
@@ -66,8 +66,7 @@ def trainer(data_params,
         layers=model_params.get("layers", 6),
         emb_dim=model_params.get("emb_dim", 512),
         pad_id=model_params.get("pad_id", 0),
-        num_pos = model_params.get("history", 120)
-    )
+        num_pos=model_params.get("history", 120))
 
     # model.encoder.sou
     if model_params.get("trained"):
@@ -158,14 +157,14 @@ def trainer(data_params,
                                     data_params.get("valid_history", 5),
                                     data_params.get("padding_mode",
                                                     "right"), "train")
-    if validation:
-        valid_dataset = Bert4RecDataset(
-            valid_data, data_params.get("group_by_col"),
-            data_params.get("data_col"), data_params.get("train_history", 120),
-            data_params.get("valid_history", 5),
-            data_params.get("padding_mode", "right"), "valid")
+    # if validation:
+    #     valid_dataset = Bert4RecDataset(
+    #         valid_data, data_params.get("group_by_col"),
+    #         data_params.get("data_col"), data_params.get("train_history", 120),
+    #         data_params.get("valid_history", 5),
+    #         data_params.get("padding_mode", "right"), "valid")
     console.save_text(os.path.join(output_dir,
-                                   "logs_model_initialization.txt"))
+                                   "logs_model_initialization.txt"), clear = False)
     if full_train:
         train_dl = DataLoader(train_dataset + valid_dataset,
                               **data_params.get("LOADERS").get("TRAIN"))
@@ -173,9 +172,9 @@ def trainer(data_params,
         train_dl = DataLoader(train_dataset,
                               **data_params.get("LOADERS").get("TRAIN"))
 
-    if validation:
-        valid_dl = DataLoader(valid_dataset,
-                              **data_params.get("LOADERS").get("VALID"))
+    # if validation:
+    #     valid_dl = DataLoader(valid_dataset,
+    #                           **data_params.get("LOADERS").get("VALID"))
 
     # if full_train:
     #     train_dl += valid_dl
@@ -227,11 +226,25 @@ def trainer(data_params,
 
         losses.append(train_loss)
 
-        if validation:
+        if validation and epoch > 1 and epoch % validation == 0:
+            valid_dataset = Bert4RecDataset(
+                valid_data, data_params.get("group_by_col"),
+                data_params.get("data_col"),
+                data_params.get("train_history", 120),
+                data_params.get("valid_history", 5),
+                data_params.get("padding_mode", "right"), "valid")
+            valid_dl = DataLoader(valid_dataset,
+                                  **data_params.get("LOADERS").get("VALID"))
             valid_loss, valid_acc = validate_step(model, valid_dl, device,
                                                   data_params.get("MASK"))
 
             valid_logger.add_row(str(epoch), str(valid_loss), str(valid_acc))
             console.log(valid_logger)
 
-        console.save_text(os.path.join(output_dir, "logs_training.txt"))
+            del valid_dataset, valid_data
+
+            console.log("VALIDATION DONE AT EPOCH ", epoch)
+
+            console.save_text(os.path.join(output_dir, "logs_training.txt"),
+                              clear=False)
+        console.save_text(os.path.join(output_dir, "logs_training.txt"), clear = False)
