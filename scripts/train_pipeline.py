@@ -241,7 +241,7 @@ def trainer(data_params,
             valid_logger.add_row(str(epoch), str(valid_loss), str(valid_acc))
             console.log(valid_logger)
 
-            del valid_dataset, valid_data
+            del valid_dataset, valid_dl
 
             console.log("VALIDATION DONE AT EPOCH ", epoch)
 
