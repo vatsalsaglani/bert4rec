@@ -37,9 +37,9 @@ def calculate_accuracy(y_pred: T.tensor, y_true: T.tensor, mask: T.tensor):
     Returns:
         T.tensor: Prediction Accuracy
     """
-    _, prediction = y_pred.max(2)
+    _, prediction = y_pred.max(1)
     y_true = T.masked_select(y_true, mask)
-    prediction = T.masked_select(prediction.permute(1, 0), mask)
+    prediction = T.masked_select(prediction, mask)
 
     return (y_true == prediction).double().mean()
 
