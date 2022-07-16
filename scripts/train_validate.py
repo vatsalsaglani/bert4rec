@@ -31,13 +31,15 @@ def train_step(model,
     for _, batch in enumerate(tqdm_notebook(loader, desc="Train Loader")):
 
         source = Variable(batch["source"].to(device))
+        source_mask = Variable(batch["source_mask"].to(device))
         target = Variable(batch["target"].to(device))
+        target_mask = Variable(batch["target_mask"].to(device))
         train_bs += [source.size(0)]
-        mask = source == MASK
+        mask = target_mask == MASK
 
         optimizer.zero_grad()
 
-        output = model(source)
+        output = model(source, source_mask)
 
         loss = calculate_loss(output, target, mask)
 
@@ -80,10 +82,12 @@ def validate_step(model, loader, device, MASK=1):
     for _, batch in enumerate(tqdm_notebook(loader, desc="Valid Loader")):
 
         source = Variable(batch["source"].to(device))
+        source_mask = Variable(batch["source_mask"].to(device))
         target = Variable(batch["target"].to(device))
-        mask = source == MASK
+        target_mask = Variable(batch["target_mask"].to(device))
+        mask = target_mask == MASK
 
-        output = model(source)
+        output = model(source, source_mask)
 
         loss = calculate_loss(output, target, mask)
         total_counts += 1
