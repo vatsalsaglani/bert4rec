@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from bert4rec_dataset import Bert4RecDataset
-from bert4rec_model import RecommendationModel
+from bert4rec_model import RecommendationModel, RecommendationTransformer
 from rich.table import Column, Table
 from rich import box
 from rich.console import Console
@@ -60,12 +60,13 @@ def trainer(data_params,
     # intialize model
     console.log("MODEL PARAMS: ", model_params)
     console.log("INITIALIZING MODEL: ", model_params)
-    model = RecommendationModel(
+    model = RecommendationTransformer(
         vocab_size=model_params.get("VOCAB_SIZE"),
         heads=model_params.get("heads", 4),
         layers=model_params.get("layers", 6),
         emb_dim=model_params.get("emb_dim", 512),
         pad_id=model_params.get("pad_id", 0),
+        num_pos = model_params.get("history", 120)
     )
 
     # model.encoder.sou
