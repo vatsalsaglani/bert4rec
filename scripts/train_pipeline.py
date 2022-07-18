@@ -184,14 +184,17 @@ def trainer(data_params,
     losses = []
     for epoch in tnrange(1, model_params.get("EPOCHS") + 1):
         if data_params.get("chunkify"):
+            console.log("CHUNKIFYING DATA")
             _train_data = train_data.sample(frac=0.25)
             _train_data.reset_index(inplace=True)
+            console.log(f"TOTAL TRAIN DATA: {len(_train_data)}")
             train_dataset = Bert4RecDataset(
                 _train_data, data_params.get("group_by_col"),
                 data_params.get("data_col"),
                 data_params.get("train_history", 120),
                 data_params.get("valid_history", 5),
                 data_params.get("padding_mode", "right"), "train")
+            console.log(f"LEN OF TRAIN DATASET: {len(train_dataset)}")
             train_dl = DataLoader(train_dataset,
                                   **data_params.get("LOADERS").get("TRAIN"))
         if epoch % 3 == 0:
