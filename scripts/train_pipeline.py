@@ -164,7 +164,8 @@ def trainer(data_params,
     #         data_params.get("valid_history", 5),
     #         data_params.get("padding_mode", "right"), "valid")
     console.save_text(os.path.join(output_dir,
-                                   "logs_model_initialization.txt"), clear = False)
+                                   "logs_model_initialization.txt"),
+                      clear=False)
     if full_train:
         train_dl = DataLoader(train_dataset + valid_dataset,
                               **data_params.get("LOADERS").get("TRAIN"))
@@ -185,7 +186,9 @@ def trainer(data_params,
             clear_output(wait=True)
         train_loss, train_acc = train_step(model, device, train_dl,
                                            optimizer, warmup_steps,
-                                           data_params.get("MASK"), data_params.get("chunkify"))
+                                           data_params.get("MASK"),
+                                           model_params.get("CLIP"),
+                                           data_params.get("chunkify"))
         train_logger.add_row(str(epoch), str(train_loss), str(train_acc))
 
         console.log(train_logger)
@@ -247,4 +250,5 @@ def trainer(data_params,
 
             console.save_text(os.path.join(output_dir, "logs_training.txt"),
                               clear=False)
-        console.save_text(os.path.join(output_dir, "logs_training.txt"), clear = False)
+        console.save_text(os.path.join(output_dir, "logs_training.txt"),
+                          clear=False)
