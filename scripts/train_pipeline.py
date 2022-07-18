@@ -1,3 +1,4 @@
+import math
 import os
 import re
 import pandas as pd
@@ -5,13 +6,14 @@ from tqdm import trange, tnrange
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 from bert4rec_dataset import Bert4RecDataset
 from bert4rec_model import RecommendationModel, RecommendationTransformer
 from rich.table import Column, Table
 from rich import box
 from rich.console import Console
 from torch import cuda
+import numpy as np
 from train_validate import train_step, validate_step
 from sklearn.model_selection import train_test_split
 from AttentionTransformer.ScheduledOptimizer import ScheduledOptimizer
@@ -185,7 +187,7 @@ def trainer(data_params,
     for epoch in tnrange(1, model_params.get("EPOCHS") + 1):
         if data_params.get("chunkify"):
             console.log("CHUNKIFYING DATA")
-            _train_data = train_data.sample(frac=0.25)
+            _train_data = train_data.sample(frac=0.2)
             _train_data.reset_index(inplace=True)
             console.log(f"TOTAL TRAIN DATA: {len(_train_data)}")
             train_dataset = Bert4RecDataset(
@@ -195,6 +197,11 @@ def trainer(data_params,
                 data_params.get("valid_history", 5),
                 data_params.get("padding_mode", "right"), "train")
             console.log(f"LEN OF TRAIN DATASET: {len(train_dataset)}")
+            randomps = np.random.permutation(len(train_dataset))
+            selectedps = math.floor(len(train_dataset * .2))
+            indices = [randomps[ix] for ix in range(selectedps)]
+            train_dataset = Subset(train_dataset, [indices])
+            console.log(f"LEN OF TRAIN DATASET SUBSET: {len(train_dataset)}")
             train_dl = DataLoader(train_dataset,
                                   **data_params.get("LOADERS").get("TRAIN"))
         if epoch % 3 == 0:
