@@ -10,7 +10,8 @@ def train_step(model,
                optimizer,
                scheduled_optim=False,
                MASK=1,
-               CLIP=2):
+               CLIP=2,
+               chunkify=False):
     """Train batch step
 
     Args:
@@ -28,7 +29,8 @@ def train_step(model,
     total_counts = 0
     train_accs = []
     train_bs = []
-    for _, batch in enumerate(tqdm_notebook(loader, desc="Train Loader")):
+    for _, batch in enumerate(tqdm_notebook(loader, desc="Train Loader"),
+                              4 if not chunkify else 1):
 
         source = Variable(batch["source"].to(device))
         source_mask = Variable(batch["source_mask"].to(device))

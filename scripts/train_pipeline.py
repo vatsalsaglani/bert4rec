@@ -1,4 +1,3 @@
-import math
 import os
 import re
 import pandas as pd
@@ -6,14 +5,13 @@ from tqdm import trange, tnrange
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader, Subset
+from torch.utils.data import DataLoader
 from bert4rec_dataset import Bert4RecDataset
 from bert4rec_model import RecommendationModel, RecommendationTransformer
 from rich.table import Column, Table
 from rich import box
 from rich.console import Console
 from torch import cuda
-import numpy as np
 from train_validate import train_step, validate_step
 from sklearn.model_selection import train_test_split
 from AttentionTransformer.ScheduledOptimizer import ScheduledOptimizer
@@ -152,13 +150,13 @@ def trainer(data_params,
     console.log("LEN OF TRAIN DATASET: ", len(train_data))
     console.log("LEN OF VALID DATASET: ", len(valid_data))
 
-    # if data_params.get("chunkify"):
-    if not data_params.get("chunkify"):
-        train_dataset = Bert4RecDataset(
-            train_data, data_params.get("group_by_col"),
-            data_params.get("data_col"), data_params.get("train_history", 120),
-            data_params.get("valid_history", 5),
-            data_params.get("padding_mode", "right"), "train")
+    train_dataset = Bert4RecDataset(train_data,
+                                    data_params.get("group_by_col"),
+                                    data_params.get("data_col"),
+                                    data_params.get("train_history", 120),
+                                    data_params.get("valid_history", 5),
+                                    data_params.get("padding_mode",
+                                                    "right"), "train")
     # if validation:
     #     valid_dataset = Bert4RecDataset(
     #         valid_data, data_params.get("group_by_col"),
@@ -166,15 +164,13 @@ def trainer(data_params,
     #         data_params.get("valid_history", 5),
     #         data_params.get("padding_mode", "right"), "valid")
     console.save_text(os.path.join(output_dir,
-                                   "logs_model_initialization.txt"),
-                      clear=False)
-    if not data_params.get("chunkify"):
-        if full_train:
-            train_dl = DataLoader(train_dataset + valid_dataset,
-                                  **data_params.get("LOADERS").get("TRAIN"))
-        else:
-            train_dl = DataLoader(train_dataset,
-                                  **data_params.get("LOADERS").get("TRAIN"))
+                                   "logs_model_initialization.txt"), clear = False)
+    if full_train:
+        train_dl = DataLoader(train_dataset + valid_dataset,
+                              **data_params.get("LOADERS").get("TRAIN"))
+    else:
+        train_dl = DataLoader(train_dataset,
+                              **data_params.get("LOADERS").get("TRAIN"))
 
     # if validation:
     #     valid_dl = DataLoader(valid_dataset,
@@ -185,31 +181,11 @@ def trainer(data_params,
 
     losses = []
     for epoch in tnrange(1, model_params.get("EPOCHS") + 1):
-        if data_params.get("chunkify"):
-            console.log("CHUNKIFYING DATA")
-            _train_data = train_data.sample(frac=0.2)
-            _train_data.reset_index(inplace=True)
-            console.log(f"TOTAL TRAIN DATA: {len(_train_data)}")
-            train_dataset = Bert4RecDataset(
-                _train_data, data_params.get("group_by_col"),
-                data_params.get("data_col"),
-                data_params.get("train_history", 120),
-                data_params.get("valid_history", 5),
-                data_params.get("padding_mode", "right"), "train")
-            console.log(f"LEN OF TRAIN DATASET: {len(train_dataset)}")
-            randomps = np.random.permutation(len(train_dataset))
-            selectedps = math.floor(len(train_dataset) * .2)
-            indices = [randomps[ix] for ix in range(selectedps)]
-            train_dataset = Subset(train_dataset, [indices])
-            console.log(f"LEN OF TRAIN DATASET SUBSET: {len(train_dataset)}")
-            train_dl = DataLoader(train_dataset,
-                                  **data_params.get("LOADERS").get("TRAIN"))
         if epoch % 3 == 0:
             clear_output(wait=True)
         train_loss, train_acc = train_step(model, device, train_dl,
                                            optimizer, warmup_steps,
-                                           data_params.get("MASK"),
-                                           model_params.get("CLIP", False))
+                                           data_params.get("MASK"), data_params.get("chunkify"))
         train_logger.add_row(str(epoch), str(train_loss), str(train_acc))
 
         console.log(train_logger)
@@ -271,5 +247,4 @@ def trainer(data_params,
 
             console.save_text(os.path.join(output_dir, "logs_training.txt"),
                               clear=False)
-        console.save_text(os.path.join(output_dir, "logs_training.txt"),
-                          clear=False)
+        console.save_text(os.path.join(output_dir, "logs_training.txt"), clear = False)
