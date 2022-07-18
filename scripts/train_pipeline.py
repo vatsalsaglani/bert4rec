@@ -198,7 +198,7 @@ def trainer(data_params,
                 data_params.get("padding_mode", "right"), "train")
             console.log(f"LEN OF TRAIN DATASET: {len(train_dataset)}")
             randomps = np.random.permutation(len(train_dataset))
-            selectedps = math.floor(len(train_dataset * .2))
+            selectedps = math.floor(len(train_dataset) * .2)
             indices = [randomps[ix] for ix in range(selectedps)]
             train_dataset = Subset(train_dataset, [indices])
             console.log(f"LEN OF TRAIN DATASET SUBSET: {len(train_dataset)}")
