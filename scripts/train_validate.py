@@ -30,7 +30,7 @@ def train_step(model,
     train_accs = []
     train_bs = []
     for _, batch in enumerate(tqdm_notebook(loader, desc="Train Loader"),
-                              4 if not chunkify else 1):
+                              4 if chunkify else 1):
 
         source = Variable(batch["source"].to(device))
         source_mask = Variable(batch["source_mask"].to(device))
