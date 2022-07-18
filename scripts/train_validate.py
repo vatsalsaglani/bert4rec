@@ -47,7 +47,8 @@ def train_step(model,
         total_loss += loss.item()
 
         loss.backward()
-        T.nn.utils.clip_grad_norm_(model.parameters(), CLIP)
+        if CLIP:
+            T.nn.utils.clip_grad_norm_(model.parameters(), CLIP)
         if scheduled_optim:
             optimizer.step_and_update_lr()
         else:
