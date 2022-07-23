@@ -108,7 +108,6 @@ def tuner(data_params,
                           **data_params.get("LOADERS").get("TRAIN"))
 
     accs = []
-    epoch = 1
 
     def tune(trial):
         learning_rate = trial.suggest_float("lr",
@@ -120,7 +119,7 @@ def tuner(data_params,
         optimizer = T.optim.SGD(model.parameters(),
                                 lr=learning_rate,
                                 momentum=momentum)
-        if epoch % 3 == 0:
+        if len(accs) + 1 % 3 == 0:
             clear_output(wait=True)
             console.log(train_logger)
 
@@ -128,14 +127,14 @@ def tuner(data_params,
                                            False, data_params.get("MASK"),
                                            model_params.get("CLIP"),
                                            data_params.get("chunkify"))
-        train_logger.add_row(str(epoch), str(train_loss), str(train_acc), str(learning_rate), str(momentum))
+        train_logger.add_row(str(len(accs) + 1), str(train_loss), str(train_acc), str(learning_rate), str(momentum))
 
         console.log(train_logger)
 
-        trial.report(train_acc, epoch)
+        trial.report(train_acc, len(accs) + 1)
 
-        if epoch > 1 and train_acc > max(accs):
-            console.log("SAVING BEST MODEL AT EPOCH -> ", epoch)
+        if len(accs) + 1 > 1 and train_acc > max(accs):
+            console.log("SAVING BEST MODEL AT EPOCH -> ", len(accs) + 1)
             console.log("LOSS OF BEST MODEL: ", train_loss)
             console.log("ACCURACY OF BEST MODEL: ", train_acc)
             console.log("LEARNING RATE OF BEST MODEL: ", learning_rate)
@@ -146,7 +145,7 @@ def tuner(data_params,
                              model_params.get("SAVE_NAME")))
             T.save(
                 dict(state_dict=model.state_dict(),
-                     epoch=epoch,
+                     epoch=len(accs) + 1,
                      train_acc=train_acc,
                      train_loss=train_loss,
                      optimizer_dict=optimizer._optimizer.state_dict()),
@@ -156,7 +155,7 @@ def tuner(data_params,
         accs.append(train_acc)
         console.save_text(os.path.join(output_dir, "logs_training.txt"),
                           clear=False)
-        epoch += 1
+        # epoch += 1
         return train_acc
 
     console.log("CREATING STUDY")
