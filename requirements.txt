@@ -5,3 +5,4 @@ rich[jupyter]
 numpy
 pandas
 scikit-learn
+ray
