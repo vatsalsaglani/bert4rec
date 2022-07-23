@@ -169,8 +169,8 @@ def trainer(data_params,
     #     train_dl = DataLoader(train_dataset + valid_dataset,
     #                           **data_params.get("LOADERS").get("TRAIN"))
     # else:
-        # train_dl = DataLoader(train_dataset,
-        #                       **data_params.get("LOADERS").get("TRAIN"))
+    # train_dl = DataLoader(train_dataset,
+    #                       **data_params.get("LOADERS").get("TRAIN"))
 
     # if validation:
     #     valid_dl = DataLoader(valid_dataset,
@@ -181,13 +181,11 @@ def trainer(data_params,
 
     losses = []
     for epoch in tnrange(1, model_params.get("EPOCHS") + 1):
-        train_dataset = Bert4RecDataset(train_data,
-                                    data_params.get("group_by_col"),
-                                    data_params.get("data_col"),
-                                    data_params.get("train_history", 120),
-                                    data_params.get("valid_history", 5),
-                                    data_params.get("padding_mode",
-                                                    "right"), "train")
+        train_dataset = Bert4RecDataset(
+            train_data, data_params.get("group_by_col"),
+            data_params.get("data_col"), data_params.get("train_history", 120),
+            data_params.get("valid_history", 5),
+            data_params.get("padding_mode", "right"), "train")
         train_dl = DataLoader(train_dataset,
                               **data_params.get("LOADERS").get("TRAIN"))
         if epoch % 3 == 0:
