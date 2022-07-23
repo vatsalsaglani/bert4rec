@@ -132,7 +132,7 @@ def tuner(data_params,
 
         console.log(train_logger)
 
-        trial.report(mean_accuracy=train_acc)
+        trial.report(train_acc, epoch)
 
         if epoch > 1 and train_acc > max(accs):
             console.log("SAVING BEST MODEL AT EPOCH -> ", epoch)
@@ -154,7 +154,7 @@ def tuner(data_params,
         accs.append(train_acc)
         console.save_text(os.path.join(output_dir, "logs_training.txt"),
                           clear=False)
-
+        epoch += 1
         return train_acc
 
     console.log("CREATING STUDY")
