@@ -32,7 +32,7 @@ def train_step(model,
     for _, batch in enumerate(tqdm_notebook(loader, desc="Train Loader")):
 
         if chunkify and _ % chunkify != 0:
-            pass
+            continue
 
         source = Variable(batch["source"].to(device))
         source_mask = Variable(batch["source_mask"].to(device))
