@@ -112,10 +112,10 @@ def tuner(data_params,
 
     def tune(trial):
         learning_rate = trial.suggest_float("lr",
-                                            train_params.get("LR_RANGE"),
+                                            *train_params.get("LR_RANGE"),
                                             log=True)
         momentum = trial.suggest_float("momentum",
-                                       train_params.get("MOM_RANGE"),
+                                       *train_params.get("MOM_RANGE"),
                                        log=True)
         optimizer = T.optim.SGD(model.parameters(),
                                 lr=learning_rate,
