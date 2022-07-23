@@ -128,7 +128,7 @@ def tuner(data_params,
                                            False, data_params.get("MASK"),
                                            model_params.get("CLIP"),
                                            data_params.get("chunkify"))
-        train_logger.add_row(str(epoch), str(train_loss), str(train_acc))
+        train_logger.add_row(str(epoch), str(train_loss), str(train_acc), str(learning_rate), str(momentum))
 
         console.log(train_logger)
 
@@ -138,6 +138,8 @@ def tuner(data_params,
             console.log("SAVING BEST MODEL AT EPOCH -> ", epoch)
             console.log("LOSS OF BEST MODEL: ", train_loss)
             console.log("ACCURACY OF BEST MODEL: ", train_acc)
+            console.log("LEARNING RATE OF BEST MODEL: ", learning_rate)
+            console.log("MOMENTUM OF BEST MODEL: ", momentum)
             T.save(
                 model,
                 os.path.join(output_dir, "model_files",
