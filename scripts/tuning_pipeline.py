@@ -111,10 +111,12 @@ def tuner(data_params,
 
     def tune(trial):
         learning_rate = trial.suggest_float("lr",
-                                            *train_params.get("LR_RANGE"),
+                                            train_params.get("LR_RANGE")[0],
+                                            train_params.get("LR_RANGE")[1],
                                             log=True)
         momentum = trial.suggest_float("momentum",
-                                       *train_params.get("MOM_RANGE"),
+                                       train_params.get("MOM_RANGE")[0],
+                                       train_params.get("MOM_RANGE")[1],
                                        log=True)
         optimizer = T.optim.SGD(model.parameters(),
                                 lr=learning_rate,
@@ -127,7 +129,8 @@ def tuner(data_params,
                                            False, data_params.get("MASK"),
                                            model_params.get("CLIP"),
                                            data_params.get("chunkify"))
-        train_logger.add_row(str(len(accs) + 1), str(train_loss), str(train_acc), str(learning_rate), str(momentum))
+        train_logger.add_row(str(len(accs) + 1), str(train_loss),
+                             str(train_acc), str(learning_rate), str(momentum))
 
         console.log(train_logger)
 
