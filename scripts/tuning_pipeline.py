@@ -18,8 +18,8 @@ from AttentionTransformer.ScheduledOptimizer import ScheduledOptimizer
 from IPython.display import clear_output
 from AttentionTransformer.utilities import count_model_parameters
 
-from ray import tune
-from ray.tune.schedulers import ASHAScheduler
+import optuna
+from optuna.trial import TrialState
 
 device = T.device('cuda') if cuda.is_available() else T.device('cpu')
 
@@ -28,13 +28,11 @@ def tuner(data_params,
           model_params,
           train_params,
           loggers,
-          output_dir="./models/",
-          validation=5):
+          output_dir="./models/"):
 
     console = loggers.get("CONSOLE")
 
     train_logger = loggers.get("TRAIN_LOGGER")
-    valid_logger = loggers.get("VALID_LOGGER")
 
     # check if output_dir/model_files available; if not create
     console.log("Verifying if Output Directory for model and logs exists")
@@ -109,17 +107,19 @@ def tuner(data_params,
     train_dl = DataLoader(train_dataset,
                           **data_params.get("LOADERS").get("TRAIN"))
 
-    optimizer = T.optim.SGD(model.parameters(),
-                            lr=train_params.get("lr"),
-                            momentum=train_params.get("momentum"))
+    accs = []
+    epoch = 1
 
-    console.save_text(os.path.join(output_dir,
-                                   "logs_model_initialization.txt"),
-                      clear=False)
-
-    losses = []
-    for epoch in trange(1, model_params.get("EPOCHS") + 1):
-
+    def tune(trial):
+        learning_rate = trial.suggest_float("lr",
+                                            train_params.get("LR_RANGE"),
+                                            log=True)
+        momentum = trial.suggest_float("momentum",
+                                       train_params.get("MOM_RANGE"),
+                                       log=True)
+        optimizer = T.optim.SGD(model.parameters(),
+                                lr=learning_rate,
+                                momentum=momentum)
         if epoch % 3 == 0:
             clear_output(wait=True)
             console.log(train_logger)
@@ -132,24 +132,9 @@ def tuner(data_params,
 
         console.log(train_logger)
 
-        tune.report(mean_accuracy=train_acc)
+        trial.report(mean_accuracy=train_acc)
 
-        if epoch == 1:
-            console.log(f"Saving Initial Model")
-            T.save(
-                model,
-                os.path.join(output_dir, "model_files_initial",
-                             model_params.get("SAVE_NAME")))
-            T.save(
-                dict(state_dict=model.state_dict(),
-                     epoch=epoch,
-                     train_loss=train_loss,
-                     train_acc=train_acc,
-                     optimizer_dict=optimizer._optimizer.state_dict()),
-                os.path.join(output_dir, "model_files_initial",
-                             model_params.get("SAVE_STATE_DICT_NAME")))
-
-        if epoch > 1 and min(losses) > train_loss:
+        if epoch > 1 and train_acc > max(accs):
             console.log("SAVING BEST MODEL AT EPOCH -> ", epoch)
             console.log("LOSS OF BEST MODEL: ", train_loss)
             console.log("ACCURACY OF BEST MODEL: ", train_acc)
@@ -166,7 +151,39 @@ def tuner(data_params,
                 os.path.join(output_dir, "model_files",
                              model_params.get("SAVE_STATE_DICT_NAME")))
 
-        losses.append(train_loss)
-
+        accs.append(train_acc)
         console.save_text(os.path.join(output_dir, "logs_training.txt"),
                           clear=False)
+
+        return train_acc
+
+    console.log("CREATING STUDY")
+    study = optuna.create_study(direction="maximize")
+    console.log("CREATED STUDY")
+    console.log("STARTED OPTIMIZING")
+    study.optimize(tune,
+                   n_trials=train_params.get("TRIALS"),
+                   timeout=train_params.get("TIMEOUT"))
+    console.log("COMPLETED OPTIMIZING")
+
+    pruned_trials = study.get_trials(deepcopy=False,
+                                     states=[TrialState.PRUNED])
+    complete_trials = study.get_trials(deepcopy=False,
+                                       states=[TrialState.COMPLETE])
+
+    console.log("Study statistics: ")
+    console.log("  Number of finished trials: ", len(study.trials))
+    console.log("  Number of pruned trials: ", len(pruned_trials))
+    console.log("  Number of complete trials: ", len(complete_trials))
+
+    console.log("Best trial:")
+    trial = study.best_trial
+
+    console.log("  Value: ", trial.value)
+
+    console.log("  Params: ")
+    for key, value in trial.params.items():
+        console.log("    {}: {}".format(key, value))
+
+    console.save_text(os.path.join(output_dir, "logs_training.txt"),
+                      clear=False)
