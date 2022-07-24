@@ -166,7 +166,7 @@ def trainer(data_params,
     #         data_params.get("padding_mode", "right"), "valid")
     console.save_text(os.path.join(output_dir,
                                    "logs_model_initialization.txt"),
-                      clear=False)
+                      clear=True)
     # if full_train:
     #     train_dl = DataLoader(train_dataset + valid_dataset,
     #                           **data_params.get("LOADERS").get("TRAIN"))
@@ -257,6 +257,6 @@ def trainer(data_params,
             console.log("VALIDATION DONE AT EPOCH ", epoch)
 
             console.save_text(os.path.join(output_dir, "logs_training.txt"),
-                              clear=False)
+                              clear=True)
         console.save_text(os.path.join(output_dir, "logs_training.txt"),
-                          clear=False)
+                          clear=True)

@@ -157,7 +157,7 @@ def tuner(data_params,
 
         accs.append(train_acc)
         console.save_text(os.path.join(output_dir, "logs_training.txt"),
-                          clear=False)
+                          clear=True)
         # epoch += 1
         return train_acc
 
@@ -190,4 +190,4 @@ def tuner(data_params,
         console.log("    {}: {}".format(key, value))
 
     console.save_text(os.path.join(output_dir, "logs_training.txt"),
-                      clear=False)
+                      clear=True)
