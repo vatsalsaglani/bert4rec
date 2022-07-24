@@ -39,7 +39,8 @@ def train_step(model,
         target = Variable(batch["target"].to(device))
         target_mask = Variable(batch["target_mask"].to(device))
         train_bs += [source.size(0)]
-        mask = target_mask == MASK
+        # mask = target_mask == MASK
+        mask = source == MASK
 
         optimizer.zero_grad()
 
