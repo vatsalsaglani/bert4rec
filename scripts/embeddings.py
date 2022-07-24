@@ -35,7 +35,7 @@ class PositionWiseFeedForward(nn.Module):
     '''
     Feed Forward Layer
     '''
-    def __init__(self, dim_in, dim_hid, elu_func: str = 'relu', dropout=0.1):
+    def __init__(self, dim_in, dim_hid, elu_func: str = 'gelu', dropout=0.1):
 
         super().__init__()
         activation_dict = {
