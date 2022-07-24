@@ -151,7 +151,7 @@ def tuner(data_params,
                      epoch=len(accs) + 1,
                      train_acc=train_acc,
                      train_loss=train_loss,
-                     optimizer_dict=optimizer._optimizer.state_dict()),
+                     optimizer_dict=optimizer.state_dict()),
                 os.path.join(output_dir, "model_files",
                              model_params.get("SAVE_STATE_DICT_NAME")))
 
