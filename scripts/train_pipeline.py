@@ -149,13 +149,15 @@ def trainer(data_params,
     console.log("LEN OF TRAIN DATASET: ", len(train_data))
     console.log("LEN OF VALID DATASET: ", len(valid_data))
 
-    # train_dataset = Bert4RecDataset(train_data,
-    #                                 data_params.get("group_by_col"),
-    #                                 data_params.get("data_col"),
-    #                                 data_params.get("train_history", 120),
-    #                                 data_params.get("valid_history", 5),
-    #                                 data_params.get("padding_mode",
-    #                                                 "right"), "train")
+    train_dataset = Bert4RecDataset(train_data,
+                                    data_params.get("group_by_col"),
+                                    data_params.get("data_col"),
+                                    data_params.get("train_history", 120),
+                                    data_params.get("valid_history", 5),
+                                    data_params.get("padding_mode",
+                                                    "right"), "train")
+    train_dl = DataLoader(train_dataset,
+                          **data_params.get("LOADERS").get("TRAIN"))
     # if validation:
     #     valid_dataset = Bert4RecDataset(
     #         valid_data, data_params.get("group_by_col"),
@@ -181,13 +183,13 @@ def trainer(data_params,
 
     losses = []
     for epoch in tnrange(1, model_params.get("EPOCHS") + 1):
-        train_dataset = Bert4RecDataset(
-            train_data, data_params.get("group_by_col"),
-            data_params.get("data_col"), data_params.get("train_history", 120),
-            data_params.get("valid_history", 5),
-            data_params.get("padding_mode", "right"), "train")
-        train_dl = DataLoader(train_dataset,
-                              **data_params.get("LOADERS").get("TRAIN"))
+        # train_dataset = Bert4RecDataset(
+        #     train_data, data_params.get("group_by_col"),
+        #     data_params.get("data_col"), data_params.get("train_history", 120),
+        #     data_params.get("valid_history", 5),
+        #     data_params.get("padding_mode", "right"), "train")
+        # train_dl = DataLoader(train_dataset,
+        #                       **data_params.get("LOADERS").get("TRAIN"))
         if epoch % 3 == 0:
             clear_output(wait=True)
         train_loss, train_acc = train_step(model, device, train_dl,
