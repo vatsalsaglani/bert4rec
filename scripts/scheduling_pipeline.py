@@ -100,7 +100,7 @@ def scheduler(data_params,
                                     data_params.get("valid_history", 5),
                                     data_params.get("padding_mode",
                                                     "right"), "train")
-    print(f'LEN OF DATASET OBJECT: ', len(train_dataset))
+    console.log(f'LEN OF DATASET OBJECT: ', len(train_dataset))
     train_dl = DataLoader(train_dataset,
                           **data_params.get("LOADERS").get("TRAIN"))
 
