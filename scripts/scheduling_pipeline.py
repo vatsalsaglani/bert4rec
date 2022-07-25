@@ -126,7 +126,7 @@ def scheduler(data_params,
             train_dl,
             optimizer,
             CLIP=model_params.get("CLIP"),
-            chunkify=model_params.get("chunkify"))
+            chunkify=data_params.get("chunkify"))
         train_logger.add_row(str(epoch), str(train_loss), str(train_acc))
 
         console.log(train_logger)
