@@ -17,6 +17,8 @@ from sklearn.model_selection import train_test_split
 from AttentionTransformer.ScheduledOptimizer import ScheduledOptimizer
 from IPython.display import clear_output
 from AttentionTransformer.utilities import count_model_parameters
+import random
+import numpy as np
 
 device = T.device('cuda') if cuda.is_available() else T.device('cpu')
 
@@ -54,6 +56,9 @@ def trainer(data_params,
     console.log("SEED WITH: ", model_params.get("SEED"))
     T.manual_seed(model_params["SEED"])
     T.cuda.manual_seed(model_params["SEED"])
+    np.random.seed(model_params.get("SEED"))
+    random.seed(model_params.get("SEED"))
+    
     T.backends.cudnn.deterministic = True
 
     # intialize model

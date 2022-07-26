@@ -17,6 +17,8 @@ from sklearn.model_selection import train_test_split
 from AttentionTransformer.ScheduledOptimizer import ScheduledOptimizer
 from IPython.display import clear_output
 from AttentionTransformer.utilities import count_model_parameters
+import random
+import numpy as np
 
 import optuna
 from optuna.trial import TrialState
@@ -62,6 +64,8 @@ def tuner(data_params,
     console.log(f"SEEDING WITH: {model_params.get('SEED')}")
     T.manual_seed(model_params["SEED"])
     T.cuda.manual_seed(model_params["SEED"])
+    np.random.seed(model_params.get("SEED"))
+    random.seed(model_params.get("SEED"))
     T.backends.cudnn.deterministic = True
 
     console.log("MODEL PARAMS: ", model_params)

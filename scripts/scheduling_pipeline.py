@@ -18,6 +18,8 @@ from AttentionTransformer.ScheduledOptimizer import ScheduledOptimizer
 from IPython.display import clear_output
 from AttentionTransformer.utilities import count_model_parameters
 from torch.optim import lr_scheduler as lrs
+import random
+import numpy as np
 
 device = T.device('cuda') if cuda.is_available() else T.device('cpu')
 
@@ -51,6 +53,8 @@ def scheduler(data_params,
     console.log("SEED WITH: ", model_params.get("SEED"))
     T.manual_seed(model_params["SEED"])
     T.cuda.manual_seed(model_params["SEED"])
+    random.seed(model_params.get("SEED"))
+    np.random.seed(model_params.get("SEED"))
     T.backends.cudnn.deterministic = True
 
     # intialize model
