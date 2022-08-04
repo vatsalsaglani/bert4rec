@@ -22,7 +22,10 @@ class Bert4RecDataset(Dataset):
                  train_history: int = 120,
                  valid_history: int = 5,
                  padding_mode: str = "right",
-                 split_mode: str = "train"):
+                 split_mode: str = "train",
+                 threshold_column="rating",
+                 threshold=3.5,
+                 timestamp_col="timestamp"):
         """Bert4RecDataset object
 
         Args:
@@ -33,6 +36,9 @@ class Bert4RecDataset(Dataset):
             valid_history (int, optional): Maximum validation sequence length. Defaults to 5.
             padding_mode (str, optional): Pad to left or right. Defaults to right.
             split_mode (str, optional): Split data for train, valid and test. Defaults to train.
+            threshold_column (str, optional): Get column with regressive threshold
+            threshold (int, optional): Consider rows where threshold_column greater than threshold
+            timestamp_col (str, optional): Column name where timestamps are stored
         """
         super().__init__()
 
@@ -46,6 +52,13 @@ class Bert4RecDataset(Dataset):
         self.mask = TRAIN_CONSTANTS.MASK
         self.padding_mode = padding_mode
         self.split_mode = split_mode
+        self.timestamp_col = timestamp_col
+
+        if threshold_column:
+            self.data_csv = self.data_csv[
+                self.data_csv[threshold_column] >= threshold]
+            self.data_csv.reset_index(inplace=True)
+
 
         self.groups_df = self.data_csv.groupby(by=self.group_by_col)
         self.groups = list(self.groups_df.groups)
@@ -138,6 +151,10 @@ class Bert4RecDataset(Dataset):
         group = self.groups[idx]
 
         group_df = self.groups_df.get_group(group)
+
+        group_df = group_df.sort_values(by=[self.timestamp_col])
+
+        group_df.reset_index(inplace = True)
 
         sequence = self.get_sequence(group_df)
 
