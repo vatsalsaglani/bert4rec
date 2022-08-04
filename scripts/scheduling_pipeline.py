@@ -118,9 +118,6 @@ def scheduler(data_params,
     losses = []
 
     for epoch in tnrange(1, model_params.get("EPOCHS") + 1):
-        if scheduling_parameters.get("TYPE") == "step":
-            schedule.step()
-            console.log(f"EPOCH: {epoch} | LR: {schedule.get_lr()[0]}")
         if epoch % 5 == 0:
             clear_output(wait=True)
             console.log(train_logger)
@@ -170,11 +167,14 @@ def scheduler(data_params,
 
         console.save_text(os.path.join(output_dir, "logs_training.txt"),
                           clear=True)
+        if scheduling_parameters.get("TYPE") == "step":
+            schedule.step()
+            console.log(f"EPOCH: {epoch} | LR: {schedule.get_last_lr()}")
         if scheduling_parameters.get("TYPE") == "reduce":
             if scheduling_parameters.get("DECAY_PARAM") == "acc":
                 schedule.step(train_acc)
                 try:
-                    console.log(f"EPOCH: {epoch} | LR: {schedule.get_lr()[0]}")
+                    console.log(f"EPOCH: {epoch} | LR: {schedule.get_last_lr()}")
                 except Exception as e:
                     console.log(
                         f"EXCEPTION GETTING LR FROM SCHEDULER: {str(e)}")
