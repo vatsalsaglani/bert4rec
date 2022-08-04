@@ -103,7 +103,10 @@ def scheduler(data_params,
                                     data_params.get("train_history", 120),
                                     data_params.get("valid_history", 5),
                                     data_params.get("padding_mode",
-                                                    "right"), "train")
+                                                    "right"), "train",
+                                    data_params.get("threshold_column"),
+                                    data_params.get("threshold"),
+                                    data_params.get("timestamp_col"))
     console.log(f'LEN OF DATASET OBJECT: ', len(train_dataset))
     train_dl = DataLoader(train_dataset,
                           **data_params.get("LOADERS").get("TRAIN"))
@@ -174,7 +177,8 @@ def scheduler(data_params,
             if scheduling_parameters.get("DECAY_PARAM") == "acc":
                 schedule.step(train_acc)
                 try:
-                    console.log(f"EPOCH: {epoch} | LR: {schedule.get_last_lr()}")
+                    console.log(
+                        f"EPOCH: {epoch} | LR: {schedule.get_last_lr()}")
                 except Exception as e:
                     console.log(
                         f"EXCEPTION GETTING LR FROM SCHEDULER: {str(e)}")

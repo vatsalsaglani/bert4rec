@@ -107,7 +107,10 @@ def tuner(data_params,
                                     data_params.get("train_history", 120),
                                     data_params.get("valid_history", 5),
                                     data_params.get("padding_mode",
-                                                    "right"), "train")
+                                                    "right"), "train",
+                                    data_params.get("threshold_column"),
+                                    data_params.get("threshold"),
+                                    data_params.get("timestamp_col"))
     train_dl = DataLoader(train_dataset,
                           **data_params.get("LOADERS").get("TRAIN"))
 

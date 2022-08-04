@@ -60,6 +60,9 @@ data_params = dict(
     padding_mode="right",
     MASK=TRAIN_CONSTANTS.MASK,
     chunkify=10,
+    threshold_column="rating",
+    threshold=3.5,
+    timestamp_col="timestamp",
     LOADERS=dict(TRAIN=dict(batch_size=64, shuffle=False, num_workers=0),
                  VALID=dict(batch_size=32, shuffle=False, num_workers=0)))
 
